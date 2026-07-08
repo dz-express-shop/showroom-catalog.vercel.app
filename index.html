@@ -1,272 +1,844 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Mobile Showroom</title>
+    <title>G CARS TLEMCEN | Elite Digital Showroom</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .vendue-blur { filter: grayscale(100%) brightness(50%); }
-        .ribbon {
-            position: absolute; top: 15px; right: -35px;
-            transform: rotate(45deg); width: 130px;
-            background: #dc2626; color: white; text-align: center;
-            font-weight: 900; font-size: 0.75rem; py: 2px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 10;
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#030305',
+                        surface: '#0d0d12',
+                        bordercolor: '#1a1a24',
+                        laserred: '#f43f5e',
+                    },
+                    animation: {
+                        'shimmer': 'shimmer 3s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        shimmer: {
+                            '0%': { backgroundPosition: '200% center' },
+                            '100%': { backgroundPosition: '-200% center' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-6px)' },
+                        }
+                    }
+                }
+            }
         }
-        /* Smooth scale animation for toggle */
-        .toggle-dot { transition: transform 0.2s ease-in-out; }
+    </script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Alexandria:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #030305;
+            color: #f4f4f5;
+            font-family: 'Outfit', 'Alexandria', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 95px;
+        }
+
+        .mobile-viewport {
+            max-width: 440px;
+            margin: 0 auto;
+            background: #030305;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 80px rgba(244, 63, 94, 0.06);
+            border-left: 1px solid #1a1a24;
+            border-right: 1px solid #1a1a24;
+        }
+
+        .glass-header {
+            background: rgba(13, 13, 18, 0.8);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .text-glow-animated {
+            background: linear-gradient(to right, #ffffff 20%, #f43f5e 40%, #ff6b81 50%, #f43f5e 60%, #ffffff 80%);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(244, 63, 94, 0.25);
+        }
+
+        .swipe-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .swipe-container::-webkit-scrollbar { display: none; }
+        .swipe-slide {
+            flex: 0 0 100%;
+            scroll-snap-align: center;
+        }
+
+        .bottom-sheet {
+            transform: translateY(100%);
+            transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 36px 36px 0 0;
+            background: #0d0d12;
+            border-top: 1px solid #27272a;
+        }
+        .bottom-sheet.active { transform: translateY(0); }
+
+        .card-premium {
+            background: linear-gradient(145deg, #0d0d12 0%, #121218 100%);
+            border: 1px solid #1a1a24;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card-premium.vendue-mode {
+            filter: grayscale(100%) brightness(55%);
+            border-color: #27272a;
+        }
+
+        .ribbon-sold {
+            position: absolute; top: 22px; right: -32px;
+            transform: rotate(45deg); width: 135px;
+            background: #f43f5e; color: white; text-align: center;
+            font-weight: 900; font-size: 0.7rem; letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6); z-index: 20;
+        }
+
+        .card-animate {
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="bg-neutral-950 text-white font-sans antialiased select-none">
+<body class="antialiased select-none">
 
-    <!-- Top Mobile Header -->
-    <header class="bg-neutral-900/80 backdrop-blur-lg border-b border-neutral-800 sticky top-0 z-50 px-4 py-3.5 flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <span class="text-amber-500 text-xl font-black tracking-wider">VERAVISION</span>
-            <span class="text-[10px] bg-neutral-800 text-amber-400 px-2 py-0.5 rounded-full font-bold border border-amber-500/20">LIVE CATALOG</span>
-        </div>
-        <button onclick="toggleDashboard()" id="dashBtn" class="bg-amber-500 active:scale-95 text-neutral-950 font-bold px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-amber-500/10">
-            <i class="fa-solid fa-sliders text-sm"></i> <span>لوحة التحكم</span>
-        </button>
-    </header>
-
-    <!-- Content Container -->
-    <main class="p-4 max-w-md mx-auto pb-24">
-
-        <!-- ================= MOBILE DASHBOARD (HIDDEN BY DEFAULT) ================= -->
-        <section id="dashboardPanel" class="hidden mb-8 p-5 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl">
-            <h2 class="text-lg font-black text-amber-500 mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-circle-plus"></i> إضافة طوموبيل جديدة ديريكت
-            </h2>
+    <div class="mobile-viewport">
+        
+        <header class="glass-header sticky top-0 z-40 px-5 py-4 flex justify-between items-center">
+            <div onclick="verifyAdminAccess()" class="flex items-center gap-1.5 bg-laserred/10 border border-laserred/20 px-3 py-1 rounded-full cursor-pointer active:scale-95 transition-all">
+                <i class="fa-solid fa-location-dot text-laserred text-[9px] animate-pulse"></i>
+                <span id="label-showroom" class="text-[9px] font-black tracking-widest text-laserred uppercase">Tlemcen, Algérie</span>
+            </div>
             
-            <form id="carForm" onsubmit="addCar(event)" class="space-y-3.5">
-                <input type="text" id="brand" placeholder="الماركة والموديل (مثال: Golf 8 R)" required class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="number" id="year" placeholder="العام (2024)" required class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
-                    <input type="text" id="price" placeholder="السعر (مثال: 850 مليون)" required class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
+            <h1 class="text-xl font-black uppercase tracking-tighter text-glow-animated animate-shimmer" id="brand-logo">
+                G CARS TLEMCEN
+            </h1>
+
+            <button onclick="toggleAppLanguage()" id="lang-toggle-btn" class="text-[9px] font-black border border-white/5 bg-white/5 px-3 py-1.5 rounded-full text-gray-300 active:scale-95 transition font-sans">
+                عربية
+            </button>
+        </header>
+
+        <section id="secureAdminDashboard" class="hidden mx-4 mt-4 p-5 bg-neutral-900 rounded-3xl border border-neutral-800 space-y-4">
+            <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                <h2 class="text-sm font-black text-laserred uppercase tracking-wider"><i class="fa-solid fa-user-gear mr-1"></i> لوحة التحكم في المخزون</h2>
+                <button onclick="closeAdminDashboard()" class="text-xs text-gray-500 hover:text-white"><i class="fa-solid fa-circle-xmark"></i></button>
+            </div>
+            
+            <form id="adminAddCarForm" onsubmit="processNewCarData(event)" class="space-y-3">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="addMarque" placeholder="Marque (ex: AUDI)" required class="w-full bg-black border border-white/5 rounded-xl p-3 text-xs font-semibold text-white focus:outline-none focus:border-laserred">
+                    <input type="text" id="addModele" placeholder="Modèle (ex: Q3)" required class="w-full bg-black border border-white/5 rounded-xl p-3 text-xs font-semibold text-white focus:outline-none focus:border-laserred">
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="number" id="addAnnee" placeholder="2026" required class="w-full bg-black border border-white/5 rounded-xl p-3 text-xs font-semibold text-white focus:outline-none focus:border-laserred">
+                    <input type="text" id="addPrix" placeholder="9.5M / Négociable" required class="w-full bg-black border border-white/5 rounded-xl p-3 text-xs font-semibold text-white focus:outline-none focus:border-laserred">
+                    <input type="text" id="addKm" placeholder="00 km" required class="w-full bg-black border border-white/5 rounded-xl p-3 text-xs font-semibold text-white focus:outline-none focus:border-laserred">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="addMoteur" placeholder="2.0 TDI 150 CV" required class="w-full bg-black border border-white/5 rounded-xl p-3 text-xs font-semibold text-white focus:outline-none focus:border-laserred">
+                    <input type="text" id="addBoite" placeholder="AUTOMATIQUE" class="w-full bg-black border border-white/5 rounded-xl p-3 text-xs font-semibold text-white focus:outline-none focus:border-laserred">
                 </div>
 
-                <!-- Custom Camera/File Input for Mobile -->
-                <div class="relative w-full bg-neutral-950 border-2 border-dashed border-neutral-800 rounded-xl p-4 flex flex-col items-center justify-center gap-2 active:border-amber-500 transition-all">
-                    <input type="file" id="imageFile" accept="image/*" capture="environment" required class="absolute inset-0 opacity-0 cursor-pointer">
-                    <i class="fa-solid fa-camera text-neutral-500 text-xl"></i>
-                    <span id="uploadStatus" class="text-xs text-neutral-400 font-medium">اضغط هنا لتصوير السيارة أو رفع صورة</span>
-                </div>
-                
-                <div class="flex items-center justify-between bg-neutral-950 border border-neutral-800 rounded-xl p-3">
-                    <span class="text-xs text-neutral-400 font-bold">السعر قابل للمناقشة؟</span>
-                    <input type="checkbox" id="negociable" class="w-5 h-5 accent-amber-500 rounded-md">
+                <div class="bg-black border border-white/5 p-3 rounded-xl space-y-2">
+                    <label class="text-[10px] uppercase font-bold text-gray-400">تحديد مناطق الصبيغة في الهيكل:</label>
+                    <div class="grid grid-cols-3 gap-1 text-[10px] font-bold">
+                        <label class="flex items-center gap-1"><input type="checkbox" id="p_hood" class="accent-laserred"> Capot</label>
+                        <label class="flex items-center gap-1"><input type="checkbox" id="p_fdoor" class="accent-laserred"> Port. AV</label>
+                        <label class="flex items-center gap-1"><input type="checkbox" id="p_bdoor" class="accent-laserred"> Port. AR</label>
+                        <label class="flex items-center gap-1"><input type="checkbox" id="p_fwing" class="accent-laserred"> Aile AV</label>
+                        <label class="flex items-center gap-1"><input type="checkbox" id="p_bwing" class="accent-laserred"> Aile AR</label>
+                    </div>
+                    <input type="text" id="addSbihaText" placeholder="وصف حالة الصبيغة بالدارجة" required class="w-full bg-zinc-900 rounded-lg p-2 text-xs text-white focus:outline-none">
                 </div>
 
-                <button type="submit" class="w-full bg-amber-500 active:scale-95 text-neutral-950 font-black py-3.5 rounded-xl text-sm shadow-xl shadow-amber-500/10 transition-all">
-                    تأكيد النشر في الكاتالوق
-                </button>
+                <div class="relative bg-black border border-dashed border-white/10 rounded-xl p-4 flex flex-col items-center justify-center gap-1.5 active:border-laserred">
+                    <input type="file" id="uploadCameraEngine" accept="image/*" multiple class="absolute inset-0 opacity-0 cursor-pointer">
+                    <i class="fa-solid fa-camera text-gray-500 text-lg"></i>
+                    <span id="cameraEngineStatusText" class="text-[10px] text-gray-400 font-bold">التقط صور السيارة مباشرة أو ارفعها من الـ Album</span>
+                </div>
+
+                <button type="submit" class="w-full bg-laserred text-white py-3 rounded-xl font-black text-xs uppercase shadow-lg shadow-laserred/20">تأكيد ونشر السيارة في الكاتالوق ديريكت</button>
             </form>
 
-            <!-- Mobile Inventory Management -->
-            <div class="mt-6 border-t border-neutral-800 pt-5">
-                <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3">تسيير السيارات الحالية</h3>
-                <div id="adminList" class="space-y-2.5">
-                    <!-- Dynamic Mobile Admin Cards -->
+            <div class="border-t border-white/5 pt-3 space-y-2">
+                <span class="text-[10px] text-gray-400 font-bold uppercase">قائمة السيارات الحالية للوكالة:</span>
+                <div id="adminStockControlList" class="space-y-1.5 max-h-48 overflow-y-auto"></div>
+            </div>
+        </section>
+
+        <div class="px-4 pt-4 space-y-3">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-zinc-600 text-sm"></i>
+                <input type="text" id="app-search-input" oninput="renderCarsFeed()" placeholder="Rechercher marque, sbiha, prix..." class="w-full bg-surface border border-white/5 rounded-2xl pl-10 pr-4 py-3.5 text-xs font-semibold text-white placeholder-zinc-700 focus:outline-none focus:border-laserred shadow-inner">
+            </div>
+            <div class="flex overflow-x-auto gap-2 py-1" id="brands-scroll-container"></div>
+        </div>
+
+        <main class="p-4 space-y-5" id="cars-feed-list"></main>
+
+        <nav class="glass-header fixed bottom-0 w-full max-w-[440px] flex justify-around items-center pt-3 pb-5 z-40">
+            <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center text-laserred transition">
+                <i class="fa-solid fa-compass text-lg mb-0.5"></i>
+                <span id="nav-home" class="text-[8px] font-black uppercase tracking-widest">Découvrir</span>
+            </button>
+            <button onclick="openRepriseModal()" class="flex flex-col items-center text-zinc-500 active:text-white transition">
+                <i class="fa-solid fa-rotate text-lg mb-0.5"></i>
+                <span id="nav-exchange" class="text-[8px] font-black uppercase tracking-widest">Échange</span>
+            </button>
+            <a id="globalWhatsAppContactLink" href="https://wa.me/213550000000" target="_blank" class="flex flex-col items-center text-zinc-500 active:text-green-500 transition">
+                <i class="fa-brands fa-whatsapp text-xl mb-0.5"></i>
+                <span class="text-[8px] font-black uppercase tracking-widest">Contact</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <div id="carDetailModal" class="fixed inset-0 z-50 hidden flex flex-col justify-end">
+        <div class="absolute inset-0 bg-black/85 backdrop-blur-sm" onclick="closeCarDetails()"></div>
+        <div class="relative w-full max-w-[440px] mx-auto h-[95vh] flex flex-col bottom-sheet shadow-2xl" id="modalContainer">
+            <div class="w-12 h-1.5 bg-white/10 rounded-full mx-auto my-3 shrink-0"></div>
+            <button onclick="closeCarDetails()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/60 backdrop-blur text-white flex items-center justify-center hover:bg-laserred transition z-50 border border-white/5"><i class="fa-solid fa-xmark"></i></button>
+
+            <div class="flex-1 overflow-y-auto pb-28">
+                <div class="relative h-80 bg-black">
+                    <div class="swipe-container h-full w-full" id="modal-gallery-swiper" onscroll="syncGalleryCounter()"></div>
+                    <div class="absolute bottom-0 w-full h-24 bg-gradient-to-t from-black to-transparent pointer-events-none"></div>
+                    <div class="absolute bottom-4 left-4 z-10">
+                        <span id="modal-badge-year" class="bg-laserred text-white text-[9px] font-black px-2.5 py-1 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(244,63,94,0.4)]">2026</span>
+                        <h2 id="modal-car-title" class="text-2xl font-black text-white mt-1.5 leading-none">VEHICULE</h2>
+                    </div>
+                    <div class="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md border border-white/10 text-white text-[9px] px-2.5 py-1.5 rounded-full font-bold z-10">
+                        <i class="fa-solid fa-images text-laserred mr-0.5"></i> <span id="gallery-counter">1 / 1</span>
+                    </div>
+                </div>
+
+                <div class="p-4 flex justify-between items-center bg-surface border-b border-white/5">
+                    <span class="text-zinc-500 text-xs font-bold uppercase tracking-widest" id="label-price">Prix demandé</span>
+                    <span id="modal-car-price" class="text-lg font-black text-white bg-laserred/10 border border-laserred/20 px-4 py-2 rounded-xl">00 Millions</span>
+                </div>
+
+                <div class="flex border-b border-white/5 bg-surface text-center text-[9px] font-black uppercase tracking-wider">
+                    <button onclick="switchTabPane('specs')" id="tab-specs" class="tab-btn flex-1 py-4 border-b-2 border-transparent text-zinc-500 transition">Fiche Auto</button>
+                    <button onclick="switchTabPane('paint')" id="tab-paint" class="tab-btn flex-1 py-4 border-b-2 border-transparent text-zinc-500 transition">La Tôle</button>
+                    <button onclick="switchTabPane('finance')" id="tab-finance" class="tab-btn flex-1 py-4 border-b-2 border-transparent text-zinc-500 transition">Islamique</button>
+                </div>
+
+                <div id="tab-pane-specs" class="p-4 space-y-3">
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-surface border border-white/5 p-4 rounded-2xl flex items-center gap-3">
+                            <div class="w-8 h-8 bg-laserred/10 rounded-xl flex items-center justify-center text-laserred"><i class="fa-solid fa-gauge-high"></i></div>
+                            <div>
+                                <span class="text-[9px] text-zinc-500 uppercase block font-bold" id="label-km">KM</span>
+                                <strong id="pane-km" class="text-xs font-black text-white">00 km</strong>
+                            </div>
+                        </div>
+                        <div class="bg-surface border border-white/5 p-4 rounded-2xl flex items-center gap-3">
+                            <div class="w-8 h-8 bg-laserred/10 rounded-xl flex items-center justify-center text-laserred"><i class="fa-solid fa-car-side"></i></div>
+                            <div>
+                                <span class="text-[9px] text-zinc-500 uppercase block font-bold" id="label-boite">Boîte</span>
+                                <strong id="pane-transmission" class="text-xs font-black text-white">Automatique</strong>
+                            </div>
+                        </div>
+                        <div class="bg-surface border border-white/5 p-4 rounded-2xl flex items-center gap-3">
+                            <div class="w-8 h-8 bg-laserred/10 rounded-xl flex items-center justify-center text-laserred"><i class="fa-solid fa-gas-pump"></i></div>
+                            <div>
+                                <span class="text-[9px] text-zinc-500 uppercase block font-bold" id="label-moteur">Moteur</span>
+                                <strong id="pane-engine" class="text-xs font-black text-white">-</strong>
+                            </div>
+                        </div>
+                        <div class="bg-surface border border-white/5 p-4 rounded-2xl flex items-center gap-3">
+                            <div class="w-8 h-8 bg-laserred/10 rounded-xl flex items-center justify-center text-laserred"><i class="fa-solid fa-palette"></i></div>
+                            <div>
+                                <span class="text-[9px] text-zinc-500 uppercase block font-bold" id="label-couleur">Couleur</span>
+                                <strong id="pane-color" class="text-xs font-black text-white">-</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-pane-paint" class="p-4 space-y-4 hidden">
+                    <div class="bg-surface border border-white/5 rounded-3xl p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="text-xs font-black text-white uppercase" id="label-sbiha-title">Scanner Tôle</h4>
+                            <span id="badge-sbiha" class="bg-laserred/20 text-laserred text-[8px] font-black px-2 py-0.5 rounded uppercase">Sbiha</span>
+                        </div>
+                        
+                        <div class="flex justify-center py-4 bg-[#0a0a0f] rounded-2xl border border-white/5 mb-4">
+                            <svg class="w-52 h-auto" viewBox="0 0 400 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="100" cy="95" r="18" fill="#1a1a24" stroke="#27272a" stroke-width="3"/>
+                                <circle cx="100" cy="95" r="8" fill="#52525b"/>
+                                <circle cx="300" cy="95" r="18" fill="#1a1a24" stroke="#27272a" stroke-width="3"/>
+                                <circle cx="300" cy="95" r="8" fill="#52525b"/>
+                                <path id="svg-hood" d="M30 65 L80 45 L110 45 L110 65 Z" fill="#1a1a24" stroke="#3f3f46" stroke-width="2"/>
+                                <path d="M110 45 L150 20 L170 20 L170 45 Z" fill="#3f3f46" opacity="0.3" stroke="#3f3f46" stroke-width="2"/>
+                                <path id="svg-front-door" d="M170 20 L230 20 L230 85 L170 85 Z" fill="#1a1a24" stroke="#3f3f46" stroke-width="2"/>
+                                <path id="svg-back-door" d="M230 20 L285 22 L285 85 L230 85 Z" fill="#1a1a24" stroke="#3f3f46" stroke-width="2"/>
+                                <path id="svg-back-wing" d="M285 22 L340 45 L370 65 L370 85 L285 85 Z" fill="#1a1a24" stroke="#3f3f46" stroke-width="2"/>
+                                <path id="svg-front-wing" d="M30 65 L30 85 L80 85 L80 65 Z" fill="#1a1a24" stroke="#3f3f46" stroke-width="2"/>
+                                <path d="M150 20 L270 20 L285 45 L170 45 Z" fill="#1a1a24" stroke="#3f3f46" stroke-width="2" opacity="0.6"/>
+                            </svg>
+                        </div>
+                        <div class="text-[9px] text-zinc-500 space-y-1.5 font-bold">
+                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-laserred inline-block shadow-[0_0_8px_rgba(244,63,94,0.4)]"></span> <span id="label-legend-painted">Zone Peinte (Sbiha / Retouche)</span></div>
+                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-zinc-800 inline-block"></span> <span id="label-legend-clean">Zone d'origine (00 Retouches)</span></div>
+                        </div>
+                        <p id="paint-verdict-text" class="text-xs font-semibold text-white bg-laserred/10 border border-laserred/10 p-3 rounded-xl mt-4 border-l-4 border-l-laserred">-</p>
+                    </div>
+                </div>
+
+                <div id="tab-pane-finance" class="p-4 space-y-4 hidden">
+                    <div class="bg-surface border border-white/5 rounded-3xl p-4 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-xs font-black text-white uppercase" id="label-finance-title">Simulateur</h4>
+                            <span class="bg-emerald-500/10 text-emerald-400 text-[9px] font-black px-2.5 py-0.5 rounded border border-emerald-500/20" id="badge-finance-free">0% Riba</span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-zinc-500 font-bold" id="label-apport">Apport Initial</span>
+                                <span id="finance-percent-display" class="text-laserred font-black text-base">30%</span>
+                            </div>
+                            <input type="range" id="apport-slider" min="30" max="80" value="30" step="5" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-laserred" oninput="executeFinanceCalculations()">
+                        </div>
+                        <div class="border-t border-white/5 pt-3 space-y-2.5 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-zinc-500 font-bold" id="label-apport-cash">Montant Avance :</span>
+                                <strong id="finance-apport-cash" class="text-white text-xs font-black">0 Millions</strong>
+                            </div>
+                            <div class="flex justify-between items-center bg-black/50 p-3.5 rounded-xl border border-white/5">
+                                <span class="text-zinc-400 font-black" id="label-mensuel">Mensualités (60 mois) :</span>
+                                <strong id="finance-monthly" class="text-laserred text-base font-black">0 Millions</strong>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </section>
 
-
-        <!-- ================= CLIENT CATALOG VIEW ================= -->
-        <section id="catalogSection">
-            <div class="mb-5">
-                <h1 class="text-2xl font-black tracking-tight mb-1">طوموبيلات الشوروم</h1>
-                <p class="text-neutral-500 text-xs font-medium">اضغط على السيارة للاتصال والتفاوض مباشرة عبر الواتساب</p>
+            <div class="absolute bottom-0 w-full p-4 bg-surface/90 backdrop-blur-md border-t border-white/5 pb-6 flex z-50">
+                <a id="action-whatsapp-link" href="#" target="_blank" class="w-full bg-[#25D366] text-white font-black py-4 rounded-2xl flex items-center justify-center active:scale-95 transition-all text-xs uppercase tracking-wider shadow-lg shadow-green-600/20">
+                    <i class="fa-brands fa-whatsapp text-lg mr-2"></i> <span id="label-cta-negotiate">Contacter le Vendeur</span>
+                </a>
             </div>
-
-            <!-- Vertical Mobile Stack -->
-            <div id="catalogGrid" class="space-y-4">
-                <!-- Dynamic Mobile Cards -->
-            </div>
-        </section>
-    </main>
-
-    <!-- Fixed Mobile Contact Strip -->
-    <div class="fixed bottom-0 left-0 right-0 bg-neutral-900/90 backdrop-blur-md border-t border-neutral-800 p-3 flex justify-between items-center max-w-md mx-auto z-40">
-        <a href="https://maps.google.com" target="_blank" class="flex flex-col items-center gap-1 text-neutral-400 active:text-amber-500">
-            <i class="fa-solid fa-map-location-dot text-lg"></i>
-            <span class="text-[10px] font-bold">موقعنا عـ الجي بي اس</span>
-        </a>
-        <div class="flex gap-4">
-            <a href="tel:0549802437" class="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 rounded-xl flex items-center justify-center text-white text-lg active:scale-95 transition-all">
-                <i class="fa-solid fa-phone"></i>
-            </a>
-            <a href="https://wa.me/213549802437" class="bg-green-600 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 active:scale-95 transition-all shadow-lg shadow-green-600/20">
-                <i class="fa-brands fa-whatsapp text-sm"></i> راسلنا ديريكت
-            </a>
         </div>
     </div>
 
-    <!-- Script Master Logic -->
-    <script>
-        const PHONE_NUMBER = "213549802437";
+    <div id="repriseSheetModal" class="fixed inset-0 z-50 hidden flex flex-col justify-end">
+        <div class="absolute inset-0 bg-black/85 backdrop-blur-sm" onclick="closeRepriseModal()"></div>
+        <div class="relative w-full max-w-[440px] mx-auto h-[88vh] bg-surface rounded-t-3xl border-t border-white/10 flex flex-col bottom-sheet" id="repriseSheet">
+            <div class="w-12 h-1.5 bg-white/10 rounded-full mx-auto my-3 shrink-0"></div>
+            <div class="px-5 py-3 border-b border-white/5 flex justify-between items-center">
+                <h3 class="text-lg font-black text-white" id="label-reprise-title">Système d'Échange</h3>
+                <button onclick="closeRepriseModal()" class="w-7 h-7 rounded-full bg-white/5 text-zinc-400 flex items-center justify-center hover:bg-laserred active:text-white transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
 
-        // Preloaded Demo Data
-        const defaultCars = [
-            { id: 1, brand: "Porsche 911 Carrera", year: "2024", price: "3.2 الملايير", negociable: false, image: "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=400&q=80", status: "disponible" },
-            { id: 2, brand: "Golf 8 R Line", year: "2023", price: "870 مليون", negociable: true, image: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=400&q=80", status: "vendue" }
+            <div class="flex-1 overflow-y-auto p-5 space-y-4">
+                <p class="text-xs text-zinc-500 font-bold leading-relaxed" id="label-reprise-desc">Proposez votre véhicule actuel. Notre équipe évaluera la différence de prix avec le véhicule souhaité.</p>
+                <div class="space-y-1">
+                    <label class="text-[9px] text-laserred font-black uppercase tracking-wider" id="label-your-car">Votre véhicule</label>
+                    <input type="text" id="rep-car-name" placeholder="Ex: Clio 4 GT Line" class="w-full bg-black border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-laserred">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="text-[9px] text-zinc-500 font-black uppercase" id="label-year">Année</label>
+                        <input type="number" id="rep-car-year" placeholder="2019" class="w-full bg-black border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] text-zinc-500 font-black uppercase" id="label-km-field">KM</label>
+                        <input type="text" id="rep-car-km" placeholder="140 000 km" class="w-full bg-black border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none">
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[9px] text-zinc-500 font-black uppercase" id="label-paint-field">État Peinture</label>
+                    <textarea id="rep-car-paint" placeholder="Ex: Sbiha f l'aile avant m3a l'capot." class="w-full bg-black border border-white/5 rounded-xl px-4 py-3 text-xs text-white h-20 resize-none focus:outline-none"></textarea>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[9px] text-laserred font-black uppercase tracking-wider" id="label-target">Véhicule souhaité</label>
+                    <select id="rep-car-target" class="w-full bg-black border border-white/5 rounded-xl p-3 text-xs text-white focus:outline-none"></select>
+                </div>
+            </div>
+
+            <div class="p-4 bg-surface/90 border-t border-white/5 pb-6">
+                <button onclick="sendReprisePayloadToWhatsApp()" class="w-full bg-laserred text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg shadow-laserred/10" id="btn-submit-proposal">Envoyer l'offre</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastAlert" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] transform -translate-y-24 opacity-0 transition-all duration-500">
+        <div class="bg-surface border border-white/10 text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5">
+            <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+            <span id="toast-txt" class="font-bold text-xs">Succès</span>
+        </div>
+    </div>
+
+    <script>
+        const SHOWROOM_WHATSAPP_NUMBER = "213550000000";
+        let secretClickCounter = 0;
+        let lastClickTime = 0;
+
+        // قاعدة البيانات الافتراضية للشوروم
+        const defaultStockDatabase = [
+            { id: 1, marque: "RENAULT", modele: "AUSTRALE", annee: "2025", prix: "Negociable", km: "23000 km", moteur: "1.3 E H 160 CV", boite: "AUTOMATIQUE", couleur: "GRIS MATE", sbiha: "N9iya (00 Peinture)", sbihaZones: { hood: false, frontDoor: false, backDoor: false, backWing: false, frontWing: false }, status: "disponible", images: ["https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=400&q=80"] },
+            { id: 2, marque: "JETOUR", modele: "X70 L / 7 PLACES", annee: "2026", prix: "Negociable", km: "00 km", moteur: "1.5 ESS TURBO 184 CV", boite: "AUTOMATIQUE", couleur: "NOIR", sbiha: "Sbiha f l'aile avant m3a l'capot.", sbihaZones: { hood: true, frontDoor: false, backDoor: false, backWing: false, frontWing: true }, status: "disponible", images: ["https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=400&q=80"] },
+            { id: 3, marque: "AUDI", modele: "NEW Q3", annee: "2026", prix: "950 Millions", km: "00 km", moteur: "2.0 TDI 150 CV", boite: "AUTOMATIQUE", couleur: "Noir", sbiha: "Raccord sghir f lbab ta3 l'arrière.", sbihaZones: { hood: false, frontDoor: false, backDoor: true, backWing: false, frontWing: false }, status: "vendue", images: ["https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=400&q=80"] }
         ];
 
-        let cars = JSON.parse(localStorage.getItem('showroom_cars_v2')) || defaultCars;
-        let currentBase64Image = "";
+        let database = JSON.parse(localStorage.getItem('g_cars_master_stock')) || defaultStockDatabase;
+        let currentLang = 'fr';
+        let activeCategoryFilter = 'Tous';
+        let currentViewingCarIndex = null;
+        let adminTemporaryBase64Images = [];
+        let autoCarouselIntervals = {};
 
-        // Handle Real Mobile Camera File Upload
-        document.getElementById('imageFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('uploadStatus').innerText = "جاري معالجة الصورة...";
-                const reader = new FileReader();
-                reader.onloadend = function() {
-                    currentBase64Image = reader.result;
-                    document.getElementById('uploadStatus').innerText = "✅ تم رفع الصورة بنجاح!";
-                }
-                reader.readAsDataURL(file);
+        const translations = {
+            fr: { showroom: "Tlemcen, Algérie", searchPlaceholder: "Rechercher marque, sbiha, prix...", tous: "Tous", detailsBtn: "Négocier sur WhatsApp", specsTab: "Fiche Auto", paintTab: "La Tôle", financeTab: "Islamique", sbihaTitle: "Scanner Tôle", sbihaTag: "Sbiha", financeTitle: "Simulateur", financeTag: "0% Riba", apportLabel: "Apport Initial", apportValue: "Montant Avance :", mensuelLabel: "Mensualités (60 mois) :", repriseTitle: "Système d'Échange", repriseDesc: "Proposez votre véhicule actuel. Notre équipe évaluera la différence de prix avec le véhicule souhaité.", yourCar: "Votre véhicule", annee: "Année", km: "KM", peintureLabel: "État Peinture", targetLabel: "Véhicule souhaité", sendProposal: "Envoyer l'offre", successToast: "Envoyé avec succès !", errorFields: "Champs requis !", homeNav: "Découvrir", exchangeNav: "Échange", legendPainted: "Zone Peinte (Retouche)", legendClean: "Zone d'origine", touchDetails: "Toucher pour les détails", price: "Prix demandé", carSoldOut: "La voiture est vendue"
+            },
+            ar: { showroom: "تلمسان، الجزائر", searchPlaceholder: "ابحث عن سيارة، صبيغة، سعر...", tous: "الكل", detailsBtn: "تفاوض عبر الواتساب", specsTab: "البطاقة التقنية", paintTab: "الهيكل", financeTab: "المرابحة", sbihaTitle: "فحص الهيكل", sbihaTag: "صبيغة", financeTitle: "محاكاة التمويل", financeTag: "بدون ربا", apportLabel: "الدفعة الأولى", apportValue: "مبلغ الدفعة :", mensuelLabel: "الأقساط (60 شهر) :", repriseTitle: "نظام التبادل التلقائي", repriseDesc: "قم بتقديم سيارتك الحالية. سيقوم فريقنا بتقييم الفارق في السعر مع السيارة المطلوبة.", yourCar: "سيارتك الحالية", annee: "السنة", km: "المسافة", peintureLabel: "حالة الهيكل والصبيغة", targetLabel: "السيارة المطلوبة للبدل", sendProposal: "إرسال الطلب ديريكت", successToast: "تم الإرسال بنجاح للوكالة !", errorFields: "يرجى ملء جميع الحقول !", homeNav: "اكتشف المعرض", exchangeNav: "تبديل (Reprise)", legendPainted: "منطقة بها صبيغة / رتوشات", legendClean: "منطقة أصلية ونقية 100%", touchDetails: "اضغط لعرض كافة التفاصيل والأقساط", price: "السعر المطلوب", carSoldOut: "السيارة بيعت خلاص ❌"
             }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeUiComponents();
+            setupCameraEngineListener();
         });
 
-        function saveAndRender() {
-            localStorage.setItem('showroom_cars_v2', JSON.stringify(cars));
-            renderCatalog();
-            renderAdminList();
+        function initializeUiComponents() {
+            renderFilterCategoryPills();
+            renderCarsFeed();
+            buildRepriseTargetDropdown();
         }
 
-        function toggleDashboard() {
-            const panel = document.getElementById('dashboardPanel');
-            const btn = document.getElementById('dashBtn');
-            panel.classList.toggle('hidden');
-            if(panel.classList.contains('hidden')) {
-                btn.innerHTML = '<i class="fa-solid fa-sliders text-sm"></i> <span>لوحة التحكم</span>';
-                btn.className = "bg-amber-500 text-neutral-950 font-bold px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5";
+        // نظام الحماية السري (Triple-Click Detection Engine)
+        function verifyAdminAccess() {
+            const currentTime = new Date().getTime();
+            if (currentTime - lastClickTime < 400) {
+                secretClickCounter++;
             } else {
-                btn.innerHTML = '<i class="fa-solid fa-xmark text-sm"></i> <span>إغلاق</span>';
-                btn.className = "bg-neutral-800 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5";
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                secretClickCounter = 1;
+            }
+            lastClickTime = currentTime;
+
+            if (secretClickCounter === 3) {
+                const password = prompt("أدخل رمز الحماية الماستر الخاص بصاحب الشوروم:");
+                if (password === "7777") {
+                    document.getElementById('secureAdminDashboard').classList.remove('hidden');
+                    renderAdminStockControlTable();
+                    triggerToastNotification("تم تفعيل صلاحيات المدير بنجاح");
+                } else {
+                    alert("رمز خاطئ. لا تملك صلاحيات التعديل!");
+                }
+                secretClickCounter = 0;
             }
         }
 
-        function addCar(e) {
-            e.preventDefault();
-            const brand = document.getElementById('brand').value;
-            const year = document.getElementById('year').value;
-            const price = document.getElementById('price').value;
-            const negociable = document.getElementById('negociable').checked;
+        function closeAdminDashboard() {
+            document.getElementById('secureAdminDashboard').classList.add('hidden');
+        }
 
-            if(!currentBase64Image) {
-                alert("من فضلك صور السيارة أو ارفع صورة أولاً!");
+        // معالجة ورفع وتصوير المباشر من الهاتف (Mobile Camera Base64 Compressor)
+        function setupCameraEngineListener() {
+            document.getElementById('uploadCameraEngine').addEventListener('change', function(e) {
+                const files = e.target.files;
+                adminTemporaryBase64Images = [];
+                if (files.length > 0) {
+                    document.getElementById('cameraEngineStatusText').innerText = `جاري معالجة ورفع (${files.length}) صور...`;
+                    let loadedCount = 0;
+                    for (let i = 0; i < files.length; i++) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            adminTemporaryBase64Images.push(event.target.result);
+                            loadedCount++;
+                            if (loadedCount === files.length) {
+                                document.getElementById('cameraEngineStatusText').innerText = `✅ تم معالجة وحفظ (${files.length}) صور بنجاح!`;
+                            }
+                        };
+                        reader.readAsDataURL(files[i]);
+                    }
+                }
+            });
+        }
+
+        function processNewCarData(e) {
+            e.preventDefault();
+            if (adminTemporaryBase64Images.length === 0) {
+                alert("يرجى التقاط أو رفع صورة واحدة على الأقل للسيارة!");
                 return;
             }
 
-            const newCar = {
+            const newCarObj = {
                 id: Date.now(),
-                brand, year, price, negociable,
-                image: currentBase64Image,
-                status: "disponible"
+                marque: document.getElementById('addMarque').value.toUpperCase(),
+                modele: document.getElementById('addModele').value,
+                annee: document.getElementById('addAnnee').value,
+                prix: document.getElementById('addPrix').value,
+                km: document.getElementById('addKm').value,
+                moteur: document.getElementById('addMoteur').value,
+                boite: document.getElementById('addBoite').value || "AUTOMATIQUE",
+                couleur: "أصلي",
+                sbiha: document.getElementById('addSbihaText').value,
+                status: "disponible",
+                sbihaZones: {
+                    hood: document.getElementById('p_hood').checked,
+                    frontDoor: document.getElementById('p_fdoor').checked,
+                    backDoor: document.getElementById('p_bdoor').checked,
+                    backWing: document.getElementById('p_bwing').checked,
+                    frontWing: document.getElementById('p_fwing').checked
+                },
+                images: adminTemporaryBase64Images
             };
 
-            cars.unshift(newCar);
-            currentBase64Image = "";
-            document.getElementById('uploadStatus').innerText = "اضغط هنا لتصوير السيارة أو رفع صورة";
-            saveAndRender();
-            document.getElementById('carForm').reset();
+            database.unshift(newCarObj);
+            synchronizeAndRefresh();
+            document.getElementById('adminAddCarForm').reset();
+            adminTemporaryBase64Images = [];
+            document.getElementById('cameraEngineStatusText').innerText = "التقط صور السيارة مباشرة أو ارفعها من الـ Album";
+            triggerToastNotification("تم نشر السيارة حيا فالمعرض!");
         }
 
-        function deleteCar(id) {
-            if(confirm("هل أنت متأكد من حذف هذه السيارة؟")) {
-                cars = cars.filter(car => car.id !== id);
-                saveAndRender();
-            }
-        }
-
-        function toggleStatus(id) {
-            cars = cars.map(car => {
-                if(car.id === id) {
-                    car.status = car.status === "disponible" ? "vendue" : "disponible";
+        function changeCarStockStatus(id) {
+            database = database.map(car => {
+                if (car.id === id) {
+                    car.status = car.status === 'disponible' ? 'vendue' : 'disponible';
                 }
                 return car;
             });
-            saveAndRender();
+            synchronizeAndRefresh();
         }
 
-        function renderCatalog() {
-            const grid = document.getElementById('catalogGrid');
-            grid.innerHTML = '';
+        function removeCarFromStock(id) {
+            if (confirm("هل أنت متأكد من حذف هذه السيارة نهائياً من الكاتالوق؟")) {
+                database = database.filter(car => car.id !== id);
+                synchronizeAndRefresh();
+            }
+        }
 
-            cars.forEach(car => {
-                const isVendue = car.status === 'vendue';
-                const message = encodeURIComponent(`سلام عليكم، راني مهتم بطوموبيل ${car.brand} موديل ${car.year} لي حاطينها بسعر ${car.price}. حاب نعرف إذا متوفرة للمعاينة.`);
-                const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${message}`;
+        function synchronizeAndRefresh() {
+            localStorage.setItem('g_cars_master_stock', JSON.stringify(database));
+            renderCarsFeed();
+            renderAdminStockControlTable();
+            buildRepriseTargetDropdown();
+        }
 
-                grid.innerHTML += `
-                    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden shadow-xl relative flex flex-col group active:border-neutral-700 transition-all">
-                        ${isVendue ? '<div class="ribbon">VENDUE</div>' : ''}
-                        <div class="relative h-52 bg-neutral-950">
-                            <img src="${car.image}" alt="${car.brand}" class="w-full h-full object-cover ${isVendue ? 'vendue-blur' : ''}">
-                        </div>
-                        <div class="p-4 flex-1 flex flex-col justify-between">
-                            <div class="mb-3">
-                                <div class="flex justify-between items-start gap-2 mb-1.5">
-                                    <h3 class="text-base font-black truncate text-white">${car.brand}</h3>
-                                    <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-md font-mono font-bold">${car.year}</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-lg font-black text-amber-500">${car.price}</span>
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded ${car.negociable ? 'text-green-400 bg-green-500/10 border border-green-500/20' : 'text-neutral-400 bg-neutral-800'}">
-                                        ${car.negociable ? 'قابل للنقاش' : 'سعر ثابت'}
-                                    </span>
-                                </div>
-                            </div>
-                            <a href="${isVendue ? '#' : whatsappUrl}" target="${isVendue ? '_self' : '_blank'}" 
-                               class="w-full block text-center py-3 rounded-xl font-bold transition-all text-xs ${isVendue ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed' : 'bg-amber-500 text-neutral-950 shadow-lg shadow-amber-500/10 active:scale-[0.98]'}" onclick="${isVendue ? 'return false;' : ''}">
-                                ${isVendue ? 'السيارة مبيوعة ❌' : '<i class="fa-brands fa-whatsapp text-sm ml-1"></i> أسدم / نبرهن عبر الواتساب'}
-                            </a>
-                        </div>
-                    </div>
-                `;
+        function toggleAppLanguage() {
+            currentLang = currentLang === 'fr' ? 'ar' : 'fr';
+            document.getElementById('lang-toggle-btn').innerText = currentLang === 'fr' ? 'عربية' : 'FR';
+            
+            const htmlTag = document.documentElement;
+            if (currentLang === 'ar') {
+                htmlTag.setAttribute('dir', 'rtl');
+                document.body.style.fontFamily = "'Alexandria', sans-serif";
+            } else {
+                htmlTag.setAttribute('dir', 'ltr');
+                document.body.style.fontFamily = "'Outfit', sans-serif";
+            }
+
+            document.getElementById('label-showroom').innerText = translations[currentLang].showroom;
+            document.getElementById('app-search-input').placeholder = translations[currentLang].searchPlaceholder;
+            document.getElementById('nav-home').innerText = translations[currentLang].homeNav;
+            document.getElementById('nav-exchange').innerText = translations[currentLang].exchangeNav;
+            document.getElementById('label-sbiha-title').innerText = translations[currentLang].sbihaTitle;
+            document.getElementById('badge-sbiha').innerText = translations[currentLang].sbihaTag;
+            document.getElementById('label-legend-painted').innerText = translations[currentLang].legendPainted;
+            document.getElementById('label-legend-clean').innerText = translations[currentLang].legendClean;
+            document.getElementById('label-finance-title').innerText = translations[currentLang].financeTitle;
+            document.getElementById('badge-finance-free').innerText = translations[currentLang].financeTag;
+            document.getElementById('label-apport').innerText = translations[currentLang].apportLabel;
+            document.getElementById('label-apport-cash').innerText = translations[currentLang].apportValue;
+            document.getElementById('label-mensuel').innerText = translations[currentLang].mensuelLabel;
+            document.getElementById('label-cta-negotiate').innerText = translations[currentLang].detailsBtn;
+            document.getElementById('label-reprise-title').innerText = translations[currentLang].repriseTitle;
+            document.getElementById('label-reprise-desc').innerText = translations[currentLang].repriseDesc;
+            document.getElementById('label-your-car').innerText = translations[currentLang].yourCar;
+            document.getElementById('label-year').innerText = translations[currentLang].annee;
+            document.getElementById('label-km-field').innerText = translations[currentLang].km;
+            document.getElementById('label-paint-field').innerText = translations[currentLang].peintureLabel;
+            document.getElementById('label-target').innerText = translations[currentLang].targetLabel;
+            document.getElementById('btn-submit-proposal').innerText = translations[currentLang].sendProposal;
+            document.getElementById('label-price').innerText = translations[currentLang].price;
+
+            renderFilterCategoryPills();
+            renderCarsFeed();
+        }
+
+        function renderFilterCategoryPills() {
+            const container = document.getElementById('brands-scroll-container');
+            container.innerHTML = '';
+            const uniqueBrands = ['Tous', ...new Set(database.map(c => c.marque))];
+            uniqueBrands.forEach(brand => {
+                const isActive = brand === activeCategoryFilter;
+                const activeStyle = isActive 
+                    ? 'bg-laserred text-white shadow-[0_0_15px_rgba(244,63,94,0.35)] border border-laserred' 
+                    : 'bg-surface border border-white/5 text-zinc-400';
+                const displayLabel = brand === 'Tous' ? translations[currentLang].tous : brand;
+                container.innerHTML += `<button onclick="filterFeedByBrand('${brand}')" class="px-5 py-2 text-xs font-black rounded-full transition-all whitespace-nowrap ${activeStyle}">${displayLabel}</button>`;
             });
         }
 
-        function renderAdminList() {
-            const list = document.getElementById('adminList');
-            list.innerHTML = '';
+        function filterFeedByBrand(cat) {
+            activeCategoryFilter = cat;
+            renderFilterCategoryPills();
+            renderCarsFeed();
+        }
 
-            cars.forEach(car => {
+        // محرك التشغيل الآلي لمعرض الصور (Infinite Auto-Scroll Carousel Engine)
+        function initCardImageInfiniteCarousel(carId) {
+            const slider = document.getElementById(`slider-${carId}`);
+            if (!slider) return;
+            if (autoCarouselIntervals[carId]) clearInterval(autoCarouselIntervals[carId]);
+            
+            autoCarouselIntervals[carId] = setInterval(() => {
+                const step = slider.offsetWidth;
+                let scrollTarget = slider.scrollLeft + step;
+                if (scrollTarget >= slider.scrollWidth - 15) {
+                    scrollTarget = 0;
+                }
+                slider.scrollTo({ left: scrollTarget, behavior: 'smooth' });
+            }, 3000);
+        }
+
+        function stopCardImageCarousel(carId) {
+            if (autoCarouselIntervals[carId]) clearInterval(autoCarouselIntervals[carId]);
+        }
+
+        function updateSliderIndicatorDots(el, carId) {
+            const index = Math.round(el.scrollLeft / el.offsetWidth);
+            const dots = document.querySelectorAll(`.dot-${carId}`);
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.className = `dot-${carId} h-1 bg-laserred w-3.5 rounded-full transition-all`;
+                } else {
+                    dot.className = `dot-${carId} h-1 bg-white/20 w-1 rounded-full transition-all`;
+                }
+            });
+        }
+
+        function renderCarsFeed() {
+            const feed = document.getElementById('cars-feed-list');
+            const keyword = document.getElementById('app-search-input').value.toLowerCase().trim();
+            
+            Object.keys(autoCarouselIntervals).forEach(id => clearInterval(autoCarouselIntervals[id]));
+            feed.innerHTML = '';
+            
+            let dataset = database;
+            if (activeCategoryFilter !== 'Tous') dataset = database.filter(c => c.marque === activeCategoryFilter);
+            if (keyword) {
+                dataset = dataset.filter(c => `${c.marque} ${c.modele} ${c.sbiha}`.toLowerCase().includes(keyword));
+            }
+
+            dataset.forEach(car => {
+                const isSold = car.status === 'vendue';
+                const sbihaBadgeStyle = car.sbiha.toLowerCase().includes('00') ? 'bg-zinc-900 text-zinc-400' : 'bg-laserred/10 text-laserred';
+
+                feed.innerHTML += `
+                <div class="card-animate card-premium rounded-3xl overflow-hidden mb-5 relative ${isSold ? 'vendue-mode' : ''}">
+                    ${isSold ? '<div class="ribbon-sold">VENDUE</div>' : ''}
+                    
+                    <div class="relative h-[320px] w-full" onmouseenter="stopCardImageCarousel(${car.id})" onmouseleave="initCardImageInfiniteCarousel(${car.id})">
+                        <div id="slider-${car.id}" class="swipe-container h-full w-full" onscroll="updateSliderIndicatorDots(this, ${car.id})" onclick="openCarDetails(${car.id})">
+                            ${car.images.map(img => `
+                                <div class="swipe-slide h-full w-full relative">
+                                    <img src="${img}" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30"></div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <span class="absolute top-4 left-4 bg-laserred text-white text-[10px] font-black px-2.5 py-1 rounded-lg">${car.annee}</span>
+                        <div class="absolute top-4 right-4 bg-black/50 backdrop-blur border border-white/5 text-white text-[9px] px-2.5 py-1 rounded-full font-bold">
+                            <i class="fa-regular fa-image text-laserred mr-0.5"></i> ${car.images.length}
+                        </div>
+
+                        <div class="absolute bottom-5 w-full px-4 pointer-events-none">
+                            <div class="flex justify-between items-end mb-2">
+                                <div>
+                                    <span class="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">${car.marque}</span>
+                                    <h2 class="text-xl font-black text-white leading-none">${car.modele}</h2>
+                                </div>
+                                <span class="text-base font-black text-laserred">${car.prix}</span>
+                            </div>
+                            <div class="flex gap-1.5 text-[9px] font-bold">
+                                <span class="bg-black/60 backdrop-blur px-2.5 py-1 rounded border border-white/5 text-white"><i class="fa-solid fa-gauge-high text-laserred mr-0.5"></i> ${car.km}</span>
+                                <span class="bg-black/60 backdrop-blur px-2.5 py-1 rounded border border-white/5 truncate max-w-[180px] ${sbihaBadgeStyle}"><i class="fa-solid fa-paint-roller mr-0.5"></i> ${car.sbiha}</span>
+                            </div>
+                        </div>
+
+                        <div class="absolute bottom-2 w-full flex justify-center gap-1 pointer-events-none">
+                            ${car.images.map((_, i) => `<span class="dot-${car.id} h-1 ${i === 0 ? 'bg-laserred w-3.5' : 'bg-white/20 w-1'} rounded-full"></span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="bg-laserred/10 text-laserred hover:bg-laserred hover:text-white text-center py-3 text-[9px] font-black uppercase tracking-widest cursor-pointer transition-all flex items-center justify-center gap-1" onclick="openCarDetails(${car.id})">
+                        <span>${isSold ? translations[currentLang].carSoldOut : translations[currentLang].touchDetails}</span> <i class="fa-solid fa-chevron-up text-[8px]"></i>
+                    </div>
+                </div>`;
+                
+                setTimeout(() => initCardImageInfiniteCarousel(car.id), 200);
+            });
+        }
+
+        function openCarDetails(id) {
+            const car = database.find(c => c.id === id);
+            if (!car) return;
+            currentViewingCarIndex = database.indexOf(car);
+
+            document.getElementById('modal-badge-year').innerText = car.annee;
+            document.getElementById('modal-car-title').innerText = `${car.marque} ${car.modele}`;
+            document.getElementById('modal-car-price').innerText = car.prix;
+            document.getElementById('pane-km').innerText = car.km;
+            document.getElementById('pane-transmission').innerText = car.boite;
+            document.getElementById('pane-engine').innerText = car.moteur;
+            document.getElementById('pane-color').innerText = car.couleur;
+            document.getElementById('paint-verdict-text').innerText = car.sbiha;
+
+            // تحديث خريطة الهيكل التفاعلية
+            const zones = car.sbihaZones || { hood: false, frontDoor: false, backDoor: false, backWing: false, frontWing: false };
+            document.getElementById('svg-hood').setAttribute('fill', zones.hood ? '#f43f5e' : '#1a1a24');
+            document.getElementById('svg-front-door').setAttribute('fill', zones.frontDoor ? '#f43f5e' : '#1a1a24');
+            document.getElementById('svg-back-door').setAttribute('fill', zones.backDoor ? '#f43f5e' : '#1a1a24');
+            document.getElementById('svg-back-wing').setAttribute('fill', zones.backWing ? '#f43f5e' : '#1a1a24');
+            document.getElementById('svg-front-wing').setAttribute('fill', zones.frontWing ? '#f43f5e' : '#1a1a24');
+
+            const msg = `Salam G CARS TLEMCEN, rani nsaqsi 3la la ${car.marque} ${car.modele} (${car.annee}) li rakom 7atinha f le catalogue.`;
+            document.getElementById('action-whatsapp-link').href = `https://wa.me/${SHOWROOM_WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+
+            const swiper = document.getElementById('modal-gallery-swiper');
+            swiper.innerHTML = '';
+            car.images.forEach(img => {
+                swiper.innerHTML += `<div class="swipe-slide h-full w-full bg-black flex items-center justify-center"><img src="${img}" class="w-full h-full object-cover"></div>`;
+            });
+
+            document.getElementById('gallery-counter').innerText = `1 / ${car.images.length}`;
+            swiper.scrollLeft = 0;
+            switchTabPane('specs');
+
+            document.getElementById('carDetailModal').classList.remove('hidden');
+            setTimeout(() => { document.getElementById('modalContainer').classList.add('active'); }, 10);
+        }
+
+        function closeCarDetails() {
+            document.getElementById('modalContainer').classList.remove('active');
+            setTimeout(() => { document.getElementById('carDetailModal').classList.add('hidden'); }, 400);
+        }
+
+        function syncGalleryCounter() {
+            const swiper = document.getElementById('modal-gallery-swiper');
+            const index = Math.round(swiper.scrollLeft / swiper.offsetWidth) + 1;
+            const total = swiper.children.length;
+            document.getElementById('gallery-counter').innerText = `${index} / ${total}`;
+        }
+
+        function switchTabPane(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.className = "tab-btn flex-1 py-4 border-b-2 border-transparent text-zinc-500 transition");
+            document.getElementById(`tab-${tab}`).className = "tab-btn flex-1 py-4 border-b-2 border-laserred text-laserred transition shadow-[0_4px_15px_-5px_rgba(244,63,94,0.2)] font-black";
+
+            document.getElementById('tab-pane-specs').classList.add('hidden');
+            document.getElementById('tab-pane-paint').classList.add('hidden');
+            document.getElementById('tab-pane-finance').classList.add('hidden');
+            document.getElementById(`tab-pane-${tab}`).classList.remove('hidden');
+
+            if (tab === 'finance') executeFinanceCalculations();
+        }
+
+        function executeFinanceCalculations() {
+            const car = database[currentViewingCarIndex];
+            const numericalPrice = parseInt(car.prix.replace(/[^0-9]/g, ''));
+            if (isNaN(numericalPrice)) {
+                document.getElementById('finance-apport-cash').innerText = "Non Éligible";
+                document.getElementById('finance-monthly').innerText = "Sur demande";
+                return;
+            }
+            const currentPercent = parseInt(document.getElementById('apport-slider').value);
+            document.getElementById('finance-percent-display').innerText = `${currentPercent}%`;
+            const cashAdvance = (numericalPrice * currentPercent) / 100;
+            document.getElementById('finance-apport-cash').innerText = `${cashAdvance.toFixed(0)} Millions`;
+            const monthlyPayment = ((numericalPrice - cashAdvance) * 1.30) / 60;
+            document.getElementById('finance-monthly').innerText = `${monthlyPayment.toFixed(1)} Millions / Mois`;
+        }
+
+        function buildRepriseTargetDropdown() {
+            const dropdown = document.getElementById('rep-car-target');
+            dropdown.innerHTML = '';
+            database.forEach(car => {
+                dropdown.innerHTML += `<option value="${car.marque} ${car.modele}" class="bg-neutral-900">${car.marque} ${car.modele} (${car.prix})</option>`;
+            });
+        }
+
+        function openRepriseModal() {
+            document.getElementById('repriseSheetModal').classList.remove('hidden');
+            setTimeout(() => { document.getElementById('repriseSheet').classList.add('active'); }, 10);
+        }
+
+        function closeRepriseModal() {
+            document.getElementById('repriseSheet').classList.remove('active');
+            setTimeout(() => { document.getElementById('repriseSheetModal').classList.add('hidden'); }, 300);
+        }
+
+        function sendReprisePayloadToWhatsApp() {
+            const name = document.getElementById('rep-car-name').value;
+            const year = document.getElementById('rep-car-year').value;
+            const km = document.getElementById('rep-car-km').value;
+            const paint = document.getElementById('rep-car-paint').value;
+            const target = document.getElementById('rep-car-target').value;
+
+            if (!name || !year || !km) { triggerToastNotification(translations[currentLang].errorFields); return; }
+
+            const msg = `Salam G CARS TLEMCEN, rani حاب ندير reprise (échange):\n\n🚗 طوموبيلتي الحالية: ${name} (${year})\n🛣️ العداد: ${km}\n🎨 حالة الصبيغة: ${paint || 'صافية'}\n\n🔄 حاب نبدلها بـ: ${target}`;
+            window.open(`https://wa.me/${SHOWROOM_WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+            closeRepriseModal();
+            triggerToastNotification(translations[currentLang].successToast);
+        }
+
+        function renderAdminStockControlTable() {
+            const container = document.getElementById('adminStockControlList');
+            container.innerHTML = '';
+            database.forEach(car => {
                 const isDispo = car.status === 'disponible';
-                list.innerHTML += `
-                    <div class="bg-neutral-950 border border-neutral-800 p-3 rounded-xl flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <img src="${car.image}" class="w-10 h-10 object-cover rounded-lg border border-neutral-800 flex-shrink-0">
-                            <div class="min-w-0">
-                                <p class="text-xs font-bold text-white truncate">${car.brand}</p>
-                                <p class="text-[11px] text-amber-400 font-black">${car.price}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3 flex-shrink-0">
-                            <!-- Toggle Switch UI -->
-                            <button onclick="toggleStatus(${car.id})" class="relative inline-flex h-5 w-10 items-center rounded-full transition-colors duration-200 focus:outline-none ${isDispo ? 'bg-green-600' : 'bg-red-600'}">
-                                <span class="toggle-dot inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-200 ${isDispo ? 'translate-x-[22px]' : 'translate-x-1'}"></span>
-                            </button>
-                            <button onclick="deleteCar(${car.id})" class="text-neutral-500 hover:text-red-500 text-xs p-1">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
+                container.innerHTML += `
+                <div class="bg-black p-2.5 rounded-xl flex items-center justify-between border border-white/5">
+                    <div class="flex items-center gap-2">
+                        <img src="${car.images[0]}" class="w-8 h-8 object-cover rounded-lg">
+                        <span class="text-xs font-bold text-white">${car.marque} ${car.modele}</span>
                     </div>
-                `;
+                    <div class="flex items-center gap-2">
+                        <button onclick="changeCarStockStatus(${car.id})" class="px-2.5 py-1 text-[9px] rounded font-black ${isDispo ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">
+                            ${isDispo ? 'Disponible' : 'Vendue'}
+                        </button>
+                        <button onclick="removeCarFromStock(${car.id})" class="text-zinc-600 hover:text-red-500 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
             });
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            renderCatalog();
-            renderAdminList();
-        });
+        function triggerToastNotification(text) {
+            const toast = document.getElementById('toastAlert');
+            document.getElementById('toast-txt').innerText = text;
+            toast.className = "fixed top-6 left-1/2 -translate-x-1/2 z-[100] transform translate-y-0 opacity-100 transition-all duration-500";
+            setTimeout(() => { toast.className = "fixed top-6 left-1/2 -translate-x-1/2 z-[100] transform -translate-y-24 opacity-0 transition-all duration-500"; }, 3000);
+        }
     </script>
 </body>
 </html>
