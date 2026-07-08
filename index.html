@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Premium Mobile Showroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .vendue-blur { filter: grayscale(100%) brightness(50%); }
+        .ribbon {
+            position: absolute; top: 15px; right: -35px;
+            transform: rotate(45deg); width: 130px;
+            background: #dc2626; color: white; text-align: center;
+            font-weight: 900; font-size: 0.75rem; py: 2px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 10;
+        }
+        /* Smooth scale animation for toggle */
+        .toggle-dot { transition: transform 0.2s ease-in-out; }
+    </style>
+</head>
+<body class="bg-neutral-950 text-white font-sans antialiased select-none">
+
+    <!-- Top Mobile Header -->
+    <header class="bg-neutral-900/80 backdrop-blur-lg border-b border-neutral-800 sticky top-0 z-50 px-4 py-3.5 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="text-amber-500 text-xl font-black tracking-wider">VERAVISION</span>
+            <span class="text-[10px] bg-neutral-800 text-amber-400 px-2 py-0.5 rounded-full font-bold border border-amber-500/20">LIVE CATALOG</span>
+        </div>
+        <button onclick="toggleDashboard()" id="dashBtn" class="bg-amber-500 active:scale-95 text-neutral-950 font-bold px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-amber-500/10">
+            <i class="fa-solid fa-sliders text-sm"></i> <span>لوحة التحكم</span>
+        </button>
+    </header>
+
+    <!-- Content Container -->
+    <main class="p-4 max-w-md mx-auto pb-24">
+
+        <!-- ================= MOBILE DASHBOARD (HIDDEN BY DEFAULT) ================= -->
+        <section id="dashboardPanel" class="hidden mb-8 p-5 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl">
+            <h2 class="text-lg font-black text-amber-500 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-circle-plus"></i> إضافة طوموبيل جديدة ديريكت
+            </h2>
+            
+            <form id="carForm" onsubmit="addCar(event)" class="space-y-3.5">
+                <input type="text" id="brand" placeholder="الماركة والموديل (مثال: Golf 8 R)" required class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="number" id="year" placeholder="العام (2024)" required class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                    <input type="text" id="price" placeholder="السعر (مثال: 850 مليون)" required class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+
+                <!-- Custom Camera/File Input for Mobile -->
+                <div class="relative w-full bg-neutral-950 border-2 border-dashed border-neutral-800 rounded-xl p-4 flex flex-col items-center justify-center gap-2 active:border-amber-500 transition-all">
+                    <input type="file" id="imageFile" accept="image/*" capture="environment" required class="absolute inset-0 opacity-0 cursor-pointer">
+                    <i class="fa-solid fa-camera text-neutral-500 text-xl"></i>
+                    <span id="uploadStatus" class="text-xs text-neutral-400 font-medium">اضغط هنا لتصوير السيارة أو رفع صورة</span>
+                </div>
+                
+                <div class="flex items-center justify-between bg-neutral-950 border border-neutral-800 rounded-xl p-3">
+                    <span class="text-xs text-neutral-400 font-bold">السعر قابل للمناقشة؟</span>
+                    <input type="checkbox" id="negociable" class="w-5 h-5 accent-amber-500 rounded-md">
+                </div>
+
+                <button type="submit" class="w-full bg-amber-500 active:scale-95 text-neutral-950 font-black py-3.5 rounded-xl text-sm shadow-xl shadow-amber-500/10 transition-all">
+                    تأكيد النشر في الكاتالوق
+                </button>
+            </form>
+
+            <!-- Mobile Inventory Management -->
+            <div class="mt-6 border-t border-neutral-800 pt-5">
+                <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3">تسيير السيارات الحالية</h3>
+                <div id="adminList" class="space-y-2.5">
+                    <!-- Dynamic Mobile Admin Cards -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= CLIENT CATALOG VIEW ================= -->
+        <section id="catalogSection">
+            <div class="mb-5">
+                <h1 class="text-2xl font-black tracking-tight mb-1">طوموبيلات الشوروم</h1>
+                <p class="text-neutral-500 text-xs font-medium">اضغط على السيارة للاتصال والتفاوض مباشرة عبر الواتساب</p>
+            </div>
+
+            <!-- Vertical Mobile Stack -->
+            <div id="catalogGrid" class="space-y-4">
+                <!-- Dynamic Mobile Cards -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Fixed Mobile Contact Strip -->
+    <div class="fixed bottom-0 left-0 right-0 bg-neutral-900/90 backdrop-blur-md border-t border-neutral-800 p-3 flex justify-between items-center max-w-md mx-auto z-40">
+        <a href="https://maps.google.com" target="_blank" class="flex flex-col items-center gap-1 text-neutral-400 active:text-amber-500">
+            <i class="fa-solid fa-map-location-dot text-lg"></i>
+            <span class="text-[10px] font-bold">موقعنا عـ الجي بي اس</span>
+        </a>
+        <div class="flex gap-4">
+            <a href="tel:0549802437" class="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 rounded-xl flex items-center justify-center text-white text-lg active:scale-95 transition-all">
+                <i class="fa-solid fa-phone"></i>
+            </a>
+            <a href="https://wa.me/213549802437" class="bg-green-600 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 active:scale-95 transition-all shadow-lg shadow-green-600/20">
+                <i class="fa-brands fa-whatsapp text-sm"></i> راسلنا ديريكت
+            </a>
+        </div>
+    </div>
+
+    <!-- Script Master Logic -->
+    <script>
+        const PHONE_NUMBER = "213549802437";
+
+        // Preloaded Demo Data
+        const defaultCars = [
+            { id: 1, brand: "Porsche 911 Carrera", year: "2024", price: "3.2 الملايير", negociable: false, image: "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=400&q=80", status: "disponible" },
+            { id: 2, brand: "Golf 8 R Line", year: "2023", price: "870 مليون", negociable: true, image: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=400&q=80", status: "vendue" }
+        ];
+
+        let cars = JSON.parse(localStorage.getItem('showroom_cars_v2')) || defaultCars;
+        let currentBase64Image = "";
+
+        // Handle Real Mobile Camera File Upload
+        document.getElementById('imageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('uploadStatus').innerText = "جاري معالجة الصورة...";
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    currentBase64Image = reader.result;
+                    document.getElementById('uploadStatus').innerText = "✅ تم رفع الصورة بنجاح!";
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function saveAndRender() {
+            localStorage.setItem('showroom_cars_v2', JSON.stringify(cars));
+            renderCatalog();
+            renderAdminList();
+        }
+
+        function toggleDashboard() {
+            const panel = document.getElementById('dashboardPanel');
+            const btn = document.getElementById('dashBtn');
+            panel.classList.toggle('hidden');
+            if(panel.classList.contains('hidden')) {
+                btn.innerHTML = '<i class="fa-solid fa-sliders text-sm"></i> <span>لوحة التحكم</span>';
+                btn.className = "bg-amber-500 text-neutral-950 font-bold px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5";
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-xmark text-sm"></i> <span>إغلاق</span>';
+                btn.className = "bg-neutral-800 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function addCar(e) {
+            e.preventDefault();
+            const brand = document.getElementById('brand').value;
+            const year = document.getElementById('year').value;
+            const price = document.getElementById('price').value;
+            const negociable = document.getElementById('negociable').checked;
+
+            if(!currentBase64Image) {
+                alert("من فضلك صور السيارة أو ارفع صورة أولاً!");
+                return;
+            }
+
+            const newCar = {
+                id: Date.now(),
+                brand, year, price, negociable,
+                image: currentBase64Image,
+                status: "disponible"
+            };
+
+            cars.unshift(newCar);
+            currentBase64Image = "";
+            document.getElementById('uploadStatus').innerText = "اضغط هنا لتصوير السيارة أو رفع صورة";
+            saveAndRender();
+            document.getElementById('carForm').reset();
+        }
+
+        function deleteCar(id) {
+            if(confirm("هل أنت متأكد من حذف هذه السيارة؟")) {
+                cars = cars.filter(car => car.id !== id);
+                saveAndRender();
+            }
+        }
+
+        function toggleStatus(id) {
+            cars = cars.map(car => {
+                if(car.id === id) {
+                    car.status = car.status === "disponible" ? "vendue" : "disponible";
+                }
+                return car;
+            });
+            saveAndRender();
+        }
+
+        function renderCatalog() {
+            const grid = document.getElementById('catalogGrid');
+            grid.innerHTML = '';
+
+            cars.forEach(car => {
+                const isVendue = car.status === 'vendue';
+                const message = encodeURIComponent(`سلام عليكم، راني مهتم بطوموبيل ${car.brand} موديل ${car.year} لي حاطينها بسعر ${car.price}. حاب نعرف إذا متوفرة للمعاينة.`);
+                const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${message}`;
+
+                grid.innerHTML += `
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden shadow-xl relative flex flex-col group active:border-neutral-700 transition-all">
+                        ${isVendue ? '<div class="ribbon">VENDUE</div>' : ''}
+                        <div class="relative h-52 bg-neutral-950">
+                            <img src="${car.image}" alt="${car.brand}" class="w-full h-full object-cover ${isVendue ? 'vendue-blur' : ''}">
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <div class="mb-3">
+                                <div class="flex justify-between items-start gap-2 mb-1.5">
+                                    <h3 class="text-base font-black truncate text-white">${car.brand}</h3>
+                                    <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-md font-mono font-bold">${car.year}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg font-black text-amber-500">${car.price}</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded ${car.negociable ? 'text-green-400 bg-green-500/10 border border-green-500/20' : 'text-neutral-400 bg-neutral-800'}">
+                                        ${car.negociable ? 'قابل للنقاش' : 'سعر ثابت'}
+                                    </span>
+                                </div>
+                            </div>
+                            <a href="${isVendue ? '#' : whatsappUrl}" target="${isVendue ? '_self' : '_blank'}" 
+                               class="w-full block text-center py-3 rounded-xl font-bold transition-all text-xs ${isVendue ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed' : 'bg-amber-500 text-neutral-950 shadow-lg shadow-amber-500/10 active:scale-[0.98]'}" onclick="${isVendue ? 'return false;' : ''}">
+                                ${isVendue ? 'السيارة مبيوعة ❌' : '<i class="fa-brands fa-whatsapp text-sm ml-1"></i> أسدم / نبرهن عبر الواتساب'}
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderAdminList() {
+            const list = document.getElementById('adminList');
+            list.innerHTML = '';
+
+            cars.forEach(car => {
+                const isDispo = car.status === 'disponible';
+                list.innerHTML += `
+                    <div class="bg-neutral-950 border border-neutral-800 p-3 rounded-xl flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <img src="${car.image}" class="w-10 h-10 object-cover rounded-lg border border-neutral-800 flex-shrink-0">
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-white truncate">${car.brand}</p>
+                                <p class="text-[11px] text-amber-400 font-black">${car.price}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 flex-shrink-0">
+                            <!-- Toggle Switch UI -->
+                            <button onclick="toggleStatus(${car.id})" class="relative inline-flex h-5 w-10 items-center rounded-full transition-colors duration-200 focus:outline-none ${isDispo ? 'bg-green-600' : 'bg-red-600'}">
+                                <span class="toggle-dot inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-200 ${isDispo ? 'translate-x-[22px]' : 'translate-x-1'}"></span>
+                            </button>
+                            <button onclick="deleteCar(${car.id})" class="text-neutral-500 hover:text-red-500 text-xs p-1">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderCatalog();
+            renderAdminList();
+        });
+    </script>
+</body>
+</html>
